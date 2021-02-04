@@ -9,9 +9,3 @@ start:
 
 produce-messages:
 	docker-compose run -e CREATE_TOPICS="" kafka-cli bash /app/produce_messages_via_cli.sh
-
-consume-setup:
-	./setup_rest_consumers.sh
-
-consume-run:
-	./consume_via_rest.sh

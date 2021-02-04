@@ -38,11 +38,10 @@ services:
     depends_on:
       - kafka0
       - kafka1
-    ports:
-      - "8082:8082"
+      - nginx
     environment:
       KAFKA_REST_BOOTSTRAP_SERVERS: kafka0:29092,kafka1:29093
-      KAFKA_REST_HOST_NAME: kafka-rest-proxy
+      KAFKA_REST_HOST_NAME: the-proxy-url
       KAFKA_REST_LISTENERS: http://0.0.0.0:8082
   kafka-cli:
     depends_on:
@@ -53,8 +52,15 @@ services:
       - ./produce_messages_via_cli.sh:/app/produce_messages_via_cli.sh
     environment:
       BOOTSTRAP_SERVER: kafka0:29092
-      # special environment variable to create topics
-      # Format: <topic_name>:<topic_partitions=1>:<topic_replication=1>,<...><...><...>,...
       CREATE_TOPICS: >-
-        test.telemetry.readings:3:1,
-        test.telemetry.alarms:3:1
+        test.telemetry.readings:2:1,
+        test.telemetry.alarms:2:1,
+  nginx:
+    build:
+      context: nginx_proxy
+    ports:
+      - 8080:8080
+      - 8082:8082
+    environment:
+        TDA_READINGS_TOPIC: test.telemetry.readings
+        TDA_ERRORS_TOPIC: test.telemetry.alarms
